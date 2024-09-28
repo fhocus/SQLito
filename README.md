@@ -5,6 +5,10 @@ Un proyecto para el curso de Base de Datos II de la Universidad Nacional de San 
 
 Es un programa basado en Megatron que permite crear tablas, insertar datos, consultar datos y actualizar datos en una base de datos local con archivos estáticos. El programa no es Case Sensitive, por lo que puedes escribir `CREATE TABLE` o `create table` y el programa lo reconocerá, al igual que los nombres de las tablas y los campos.
 
+## Participantes
+
+- Fabricio Jesús Huaquisto Quispe
+
 ## Compilación
 
 Primero debe de descargar el código fuente del proyecto. Puede hacerlo clonando el repositorio con el siguiente comando:
@@ -46,7 +50,7 @@ CREATE TABLE <table_name> SET <field_name> <field_type>, <field_name> <field_typ
 El comando `INSERT` permite insertar datos en una tabla. El comando recibe el nombre de la tabla en la que se van a insertar los datos y una lista de campos y valores separados por comas.
 
 ```sql
-INSERT INTO <table_name> SET <field_name> <field_value>, <field_name> <field_value>, ..., <field_name> <field_value>;
+INSERT <table_name> SET <field_name> <field_value>, <field_name> <field_value>, ..., <field_name> <field_value>;
 ```
 
 #### UPDATE
@@ -97,10 +101,48 @@ Esto guardará los datos devueltos en una nueva tabla que podrá consultar luego
 <table_name>_<field_name>;
 ```
 
+### Palabras reservadas
+
+Las siguientes palabras son reservadas y no pueden ser usadas como nombres de tablas, campos o campos de datos:
+
+#### Comandos
+
+| Comando | Descripción |
+|-----------|-----------|
+| `CREATE` | Crea una tabla en la base de datos |
+| `INSERT` | Inserta datos en una tabla |
+| `UPDATE` | Actualiza datos en una tabla |
+| `SELECT` | Consulta datos de una tabla |
+
+
+
+#### Tipos de datos
+
+| Tipo de datos | Descripción |
+|-----------|-----------|
+| `INT` | Indica que el campo es un número entero |
+| `STR` | Indica que el campo es un texto |
+| `BOOL` | Indica que el campo es un booleano |
+
+#### Operadores
+
+| Operador | Descripción |
+|-----------|-----------|
+| `=` | Indica que el valor de un campo es igual al valor dado |
+| `!` | Indica que el valor de un campo es distinto al valor dado |
+| `>` | Indica que el valor de un campo es mayor al valor dado |
+| `<` | Indica que el valor de un campo es menor al valor dado |
+
+#### Especiales
+
+| Especial | Descripción |
+|-----------|-----------|
+| `TABLE` | Hace referencia a que se trabajará con tablas |
+| `SET` | Indica que se van a insertar datos en una tabla |
+| `WHERE` | Indica que se van a aplicar filtros a los datos devueltos |
+| `INTO` | Indica que se va a guardar los datos devueltos en una nueva tabla |
+| `\|` | Indica que se va a guardar los datos devueltos en una nueva tabla |
+
 ## Ejemplos
 
 Proximamente.
-
-## Participantes
-
-- Fabricio Jesús Huaquisto Quispe
