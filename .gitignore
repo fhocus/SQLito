@@ -1,3 +1,5 @@
 .vscode
 **/**/*.o
 SQLito.exe
+*.exe
+test*
