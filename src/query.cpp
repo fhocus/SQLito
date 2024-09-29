@@ -270,3 +270,45 @@ void Query::print()
 
   std::cout << "Save Name: " << saveName_ << std::endl;
 }
+
+Query::~Query() {}
+
+std::string Query::getQuery() const
+{
+  return query_;
+}
+
+std::string Query::getMethod() const
+{
+  return method_;
+}
+
+std::string Query::getMethodType() const
+{
+  return methodType_;
+}
+
+std::vector<std::pair<std::pair<std::string, std::string>, std::string>> Query::getArguments() const
+{
+  return arguments_;
+}
+
+std::vector<std::string> Query::getArgumentsOf() const
+{
+  return argumentsOf_;
+}
+
+std::vector<Triplet<std::pair<std::string, std::string>, char, std::string>> Query::getFilters() const
+{
+  return filters_;
+}
+
+std::vector<std::string> Query::getFiltersGroup() const
+{
+  return filtersGroup_;
+}
+
+std::string Query::getSaveName() const
+{
+  return saveName_;
+}
