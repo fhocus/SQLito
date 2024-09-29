@@ -13,7 +13,7 @@ Query *Query::parse(std::string query)
   std::string methodType;
   std::vector<std::pair<std::pair<std::string, std::string>, std::string>> arguments;
   std::vector<std::string> argumentsOf;
-  std::vector<Triplet<std::pair<std::string, std::string>, char, std::string>> filters;
+  std::vector<Triplet<std::pair<std::string, std::string>, char, std::pair<std::string, std::string>>> filters;
   std::vector<std::string> filtersGroup;
   std::string saveName;
 
@@ -100,7 +100,6 @@ Query *Query::parse(std::string query)
       }
 
       queryStream = std::stringstream(queryNext);
-      std::cout << queryNext << std::endl;
       queryStream >> queryToken;
       std::transform(queryToken.begin(), queryToken.end(), queryToken.begin(), ::tolower);
 
@@ -121,7 +120,7 @@ Query *Query::parse(std::string query)
           std::getline(queryStream, fieldValue, '\'');
           std::getline(queryStream, fieldValue, '\'');
 
-          filters.push_back(Triplet<std::pair<std::string, std::string>, char, std::string>(std::make_pair(argumentsOf[0], fieldName), op, fieldValue));
+          filters.push_back(Triplet<std::pair<std::string, std::string>, char, std::pair<std::string, std::string>>(std::make_pair(argumentsOf[0], fieldName), op, std::make_pair(argumentsOf[0], fieldValue)));
 
           queryStream >> logicOperator;
           std::transform(logicOperator.begin(), logicOperator.end(), logicOperator.begin(), ::tolower);
@@ -159,6 +158,10 @@ Query *Query::parse(std::string query)
       else
       {
         argumentStream >> argumentName;
+        if (argumentName == "*")
+        {
+          argumentOf = "all";
+        }
       }
       std::transform(argumentOf.begin(), argumentOf.end(), argumentOf.begin(), ::tolower);
       std::transform(argumentName.begin(), argumentName.end(), argumentName.begin(), ::tolower);
@@ -191,6 +194,15 @@ Query *Query::parse(std::string query)
       return nullptr;
     }
 
+    // TODO: Modificar para que vincule los argumentos de la consulta con la tabla referente en caso exista.
+    for (size_t i = 0; i < arguments.size(); i++)
+    {
+      if (arguments[i].first.first == "")
+      {
+        arguments[i].first.first = argumentsOf[0];
+      }
+    }
+
     queryStream = std::stringstream(queryNext);
     queryStream >> queryToken;
     std::transform(queryToken.begin(), queryToken.end(), queryToken.begin(), ::tolower);
@@ -198,21 +210,44 @@ Query *Query::parse(std::string query)
     std::string logicOperator;
     if (queryToken == "where")
     {
-      std::string fieldName;
+      std::string argumentOfFirst = argumentsOf[0];
+      std::string argumentFirst;
+      std::string argumentOfSecond = argumentsOf[0];
+      std::string argumentSecond;
       char op;
-      std::string fieldValue;
 
       filtersGroup.push_back("and");
 
-      while (queryStream >> fieldName)
+      while (queryStream >> argumentFirst)
       {
-        std::transform(fieldName.begin(), fieldName.end(), fieldName.begin(), ::tolower);
+        if (argumentFirst.find('.') != std::string::npos)
+        {
+          std::stringstream argumentFirstStream(argumentFirst);
+          std::getline(argumentFirstStream, argumentOfFirst, '.');
+          std::getline(argumentFirstStream, argumentFirst, '.');
+        }
+
+        std::transform(argumentFirst.begin(), argumentFirst.end(), argumentFirst.begin(), ::tolower);
+
         queryStream >> op;
 
-        std::getline(queryStream, fieldValue, '\'');
-        std::getline(queryStream, fieldValue, '\'');
+        queryStream >> argumentSecond;
+        std::stringstream argumentSecondStream(argumentSecond);
 
-        filters.push_back(Triplet<std::pair<std::string, std::string>, char, std::string>(std::make_pair(argumentsOf[0], fieldName), op, fieldValue));
+        if (argumentSecond.find('.') != std::string::npos)
+        {
+          std::getline(argumentSecondStream, argumentOfSecond, '.');
+          std::getline(argumentSecondStream, argumentSecond, '.');
+          std::transform(argumentSecond.begin(), argumentSecond.end(), argumentSecond.begin(), ::tolower);
+        }
+        else
+        {
+          std::getline(argumentSecondStream, argumentSecond, '\'');
+          std::getline(argumentSecondStream, argumentSecond, '\'');
+          argumentOfSecond = argumentOfFirst;
+        }
+
+        filters.push_back(Triplet<std::pair<std::string, std::string>, char, std::pair<std::string, std::string>>(std::make_pair(argumentOfFirst, argumentFirst), op, std::make_pair(argumentOfSecond, argumentSecond)));
 
         queryStream >> logicOperator;
         std::transform(logicOperator.begin(), logicOperator.end(), logicOperator.begin(), ::tolower);
@@ -239,7 +274,7 @@ Query *Query::parse(std::string query)
   return new Query(query, method, methodType, arguments, argumentsOf, filters, filtersGroup, saveName);
 }
 
-Query::Query(std::string query, std::string method, std::string methodType, std::vector<std::pair<std::pair<std::string, std::string>, std::string>> arguments, std::vector<std::string> argumentsOf, std::vector<Triplet<std::pair<std::string, std::string>, char, std::string>> filters, std::vector<std::string> filtersGroup, std::string saveName)
+Query::Query(std::string query, std::string method, std::string methodType, std::vector<std::pair<std::pair<std::string, std::string>, std::string>> arguments, std::vector<std::string> argumentsOf, std::vector<Triplet<std::pair<std::string, std::string>, char, std::pair<std::string, std::string>>> filters, std::vector<std::string> filtersGroup, std::string saveName)
 {
   query_ = query;
   method_ = method;
@@ -272,7 +307,7 @@ void Query::print()
   std::cout << "Filters: " << std::endl;
   for (const auto &filter : filters_)
   {
-    std::cout << "  " << filter.getFirst().first << "." << filter.getFirst().second << " " << filter.getSecond() << " " << filter.getThird() << std::endl;
+    std::cout << "  " << filter.getFirst().first << "." << filter.getFirst().second << " " << filter.getSecond() << " " << filter.getThird().first << "." << filter.getThird().second << std::endl;
   }
 
   std::cout << "Filters Group: " << std::endl;
@@ -311,7 +346,7 @@ std::vector<std::string> Query::getArgumentsOf() const
   return argumentsOf_;
 }
 
-std::vector<Triplet<std::pair<std::string, std::string>, char, std::string>> Query::getFilters() const
+std::vector<Triplet<std::pair<std::string, std::string>, char, std::pair<std::string, std::string>>> Query::getFilters() const
 {
   return filters_;
 }
