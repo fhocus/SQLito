@@ -2,7 +2,7 @@
 CXX = g++
 
 # Flags de compilación
-CXXFLAGS = -Wall -g -I./src
+CXXFLAGS = -Wall -g -I./src -std=c++20
 
 # Directorios
 SRC_DIR = src
