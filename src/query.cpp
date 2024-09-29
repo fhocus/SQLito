@@ -20,26 +20,26 @@ Query *Query::parse(std::string query)
   // Obtener el método
   queryStream >> queryToken;
   method = queryToken;
-  std::transform(method.begin(), method.end(), method.begin(), ::toupper);
+  std::transform(method.begin(), method.end(), method.begin(), ::tolower);
 
-  if (method == "CREATE")
+  if (method == "create")
   {
     // Obtener el tipo de método
     queryStream >> queryToken;
     methodType = queryToken;
-    std::transform(methodType.begin(), methodType.end(), methodType.begin(), ::toupper);
+    std::transform(methodType.begin(), methodType.end(), methodType.begin(), ::tolower);
 
-    if (methodType == "TABLE")
+    if (methodType == "table")
     {
       // Obtener el nombre de dónde se va a trabajar
       queryStream >> queryToken;
-      std::transform(queryToken.begin(), queryToken.end(), queryToken.begin(), ::toupper);
+      std::transform(queryToken.begin(), queryToken.end(), queryToken.begin(), ::tolower);
       argumentsOf.push_back(queryToken);
 
       queryStream >> queryToken;
-      std::transform(queryToken.begin(), queryToken.end(), queryToken.begin(), ::toupper);
+      std::transform(queryToken.begin(), queryToken.end(), queryToken.begin(), ::tolower);
 
-      if (queryToken == "SET")
+      if (queryToken == "set")
       {
         // Obtener los argumentos
         while (std::getline(queryStream, queryToken, ','))
@@ -49,9 +49,9 @@ Query *Query::parse(std::string query)
           std::string argumentType;
 
           argumentStream >> argumentName;
-          std::transform(argumentName.begin(), argumentName.end(), argumentName.begin(), ::toupper);
+          std::transform(argumentName.begin(), argumentName.end(), argumentName.begin(), ::tolower);
           argumentStream >> argumentType;
-          std::transform(argumentType.begin(), argumentType.end(), argumentType.begin(), ::toupper);
+          std::transform(argumentType.begin(), argumentType.end(), argumentType.begin(), ::tolower);
 
           arguments.push_back(std::make_pair(std::make_pair(argumentsOf[0], argumentName), argumentType));
         }
@@ -67,18 +67,18 @@ Query *Query::parse(std::string query)
       return nullptr;
     }
   }
-  else if (method == "INSERT" || method == "UPDATE")
+  else if (method == "insert" || method == "update")
   {
     // Obtener el nombre de dónde se va a trabajar
     queryStream >> queryToken;
-    std::transform(queryToken.begin(), queryToken.end(), queryToken.begin(), ::toupper);
+    std::transform(queryToken.begin(), queryToken.end(), queryToken.begin(), ::tolower);
     argumentsOf.push_back(queryToken);
 
     queryStream >> queryToken;
-    std::transform(queryToken.begin(), queryToken.end(), queryToken.begin(), ::toupper);
+    std::transform(queryToken.begin(), queryToken.end(), queryToken.begin(), ::tolower);
 
     // Verificar la palabra SET
-    if (queryToken == "SET")
+    if (queryToken == "set")
     {
       std::string queryNext;
       // Obtener los argumentos
@@ -89,7 +89,7 @@ Query *Query::parse(std::string query)
         std::string argumentValue;
 
         argumentStream >> argumentName;
-        std::transform(argumentName.begin(), argumentName.end(), argumentName.begin(), ::toupper);
+        std::transform(argumentName.begin(), argumentName.end(), argumentName.begin(), ::tolower);
 
         std::getline(argumentStream, argumentValue, '\'');
         std::getline(argumentStream, argumentValue, '\'');
@@ -101,9 +101,9 @@ Query *Query::parse(std::string query)
 
       queryStream = std::stringstream(queryNext);
       queryStream >> queryToken;
-      std::transform(queryToken.begin(), queryToken.end(), queryToken.begin(), ::toupper);
+      std::transform(queryToken.begin(), queryToken.end(), queryToken.begin(), ::tolower);
 
-      if (queryToken == "WHERE")
+      if (queryToken == "where")
       {
         std::string fieldName;
         char op;
@@ -116,7 +116,7 @@ Query *Query::parse(std::string query)
             filtersGroup.push_back(opLogic);
           }
           queryStream >> fieldName;
-          std::transform(fieldName.begin(), fieldName.end(), fieldName.begin(), ::toupper);
+          std::transform(fieldName.begin(), fieldName.end(), fieldName.begin(), ::tolower);
           queryStream >> op;
 
           std::getline(queryStream, fieldValue, '\'');
@@ -132,7 +132,7 @@ Query *Query::parse(std::string query)
       return nullptr;
     }
   }
-  else if (method == "SELECT")
+  else if (method == "select")
   {
     std::string queryNext;
 
@@ -153,8 +153,8 @@ Query *Query::parse(std::string query)
       {
         argumentStream >> argumentName;
       }
-      std::transform(argumentOf.begin(), argumentOf.end(), argumentOf.begin(), ::toupper);
-      std::transform(argumentName.begin(), argumentName.end(), argumentName.begin(), ::toupper);
+      std::transform(argumentOf.begin(), argumentOf.end(), argumentOf.begin(), ::tolower);
+      std::transform(argumentName.begin(), argumentName.end(), argumentName.begin(), ::tolower);
       arguments.push_back(std::make_pair(std::make_pair(argumentOf, argumentName), ""));
 
       std::getline(argumentStream, queryNext);
@@ -162,9 +162,9 @@ Query *Query::parse(std::string query)
 
     queryStream = std::stringstream(queryNext);
     queryStream >> queryToken;
-    std::transform(queryToken.begin(), queryToken.end(), queryToken.begin(), ::toupper);
+    std::transform(queryToken.begin(), queryToken.end(), queryToken.begin(), ::tolower);
 
-    if (queryToken == "FROM")
+    if (queryToken == "from")
     {
       while (std::getline(queryStream, queryToken, ';'))
       {
@@ -172,7 +172,7 @@ Query *Query::parse(std::string query)
         std::string argumentOf;
 
         argumentOfStream >> argumentOf;
-        std::transform(argumentOf.begin(), argumentOf.end(), argumentOf.begin(), ::toupper);
+        std::transform(argumentOf.begin(), argumentOf.end(), argumentOf.begin(), ::tolower);
 
         argumentsOf.push_back(argumentOf);
 
@@ -186,10 +186,10 @@ Query *Query::parse(std::string query)
 
     queryStream = std::stringstream(queryNext);
     queryStream >> queryToken;
-    std::transform(queryToken.begin(), queryToken.end(), queryToken.begin(), ::toupper);
+    std::transform(queryToken.begin(), queryToken.end(), queryToken.begin(), ::tolower);
 
     std::string opLogic;
-    if (queryToken == "WHERE")
+    if (queryToken == "where")
     {
       std::string fieldName;
       char op;
@@ -201,7 +201,7 @@ Query *Query::parse(std::string query)
           filtersGroup.push_back(opLogic);
         }
         queryStream >> fieldName;
-        std::transform(fieldName.begin(), fieldName.end(), fieldName.begin(), ::toupper);
+        std::transform(fieldName.begin(), fieldName.end(), fieldName.begin(), ::tolower);
         queryStream >> op;
 
         std::getline(queryStream, fieldValue, '\'');
@@ -214,7 +214,7 @@ Query *Query::parse(std::string query)
     if (opLogic == "|")
     {
       queryStream >> queryToken;
-      std::transform(queryToken.begin(), queryToken.end(), queryToken.begin(), ::toupper);
+      std::transform(queryToken.begin(), queryToken.end(), queryToken.begin(), ::tolower);
       saveName = queryToken;
     }
   }
