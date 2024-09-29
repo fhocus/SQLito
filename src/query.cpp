@@ -108,12 +108,17 @@ Query *Query::parse(std::string query)
         std::string fieldName;
         char op;
         std::string fieldValue;
-        std::string opLogic;
+        std::string logicOperator;
         do
         {
-          if (!opLogic.empty())
+          std::transform(logicOperator.begin(), logicOperator.end(), logicOperator.begin(), ::tolower);
+          if (!logicOperator.empty())
           {
-            filtersGroup.push_back(opLogic);
+            filtersGroup.push_back(logicOperator);
+          }
+          else
+          {
+            filtersGroup.push_back("and");
           }
           queryStream >> fieldName;
           std::transform(fieldName.begin(), fieldName.end(), fieldName.begin(), ::tolower);
@@ -123,7 +128,7 @@ Query *Query::parse(std::string query)
           std::getline(queryStream, fieldValue, '\'');
 
           filters.push_back(Triplet<std::pair<std::string, std::string>, char, std::string>(std::make_pair(argumentsOf[0], fieldName), op, fieldValue));
-        } while (queryStream >> opLogic && (opLogic == "AND" || opLogic == "OR"));
+        } while (queryStream >> logicOperator && (logicOperator == "and" || logicOperator == "or"));
       }
     }
 
@@ -188,7 +193,7 @@ Query *Query::parse(std::string query)
     queryStream >> queryToken;
     std::transform(queryToken.begin(), queryToken.end(), queryToken.begin(), ::tolower);
 
-    std::string opLogic;
+    std::string logicOperator;
     if (queryToken == "where")
     {
       std::string fieldName;
@@ -196,9 +201,9 @@ Query *Query::parse(std::string query)
       std::string fieldValue;
       do
       {
-        if (!opLogic.empty())
+        if (!logicOperator.empty())
         {
-          filtersGroup.push_back(opLogic);
+          filtersGroup.push_back(logicOperator);
         }
         queryStream >> fieldName;
         std::transform(fieldName.begin(), fieldName.end(), fieldName.begin(), ::tolower);
@@ -208,10 +213,10 @@ Query *Query::parse(std::string query)
         std::getline(queryStream, fieldValue, '\'');
 
         filters.push_back(Triplet<std::pair<std::string, std::string>, char, std::string>(std::make_pair(argumentsOf[0], fieldName), op, fieldValue));
-      } while (queryStream >> opLogic && (opLogic == "AND" || opLogic == "OR"));
+      } while (queryStream >> logicOperator && (logicOperator == "AND" || logicOperator == "OR"));
     }
 
-    if (opLogic == "|")
+    if (logicOperator == "|")
     {
       queryStream >> queryToken;
       std::transform(queryToken.begin(), queryToken.end(), queryToken.begin(), ::tolower);
