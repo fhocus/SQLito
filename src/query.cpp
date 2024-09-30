@@ -146,18 +146,18 @@ Query *Query::parse(std::string query)
     while (std::getline(queryStream, queryToken, ','))
     {
       std::stringstream argumentStream(queryToken);
+      argumentStream >> queryToken;
       std::string argumentOf = "";
       std::string argumentName;
       if (queryToken.find('.') != std::string::npos)
       {
-        argumentStream >> queryToken;
         std::stringstream argumentStreamClean(queryToken);
         std::getline(argumentStreamClean, argumentOf, '.');
         std::getline(argumentStreamClean, argumentName, '.');
       }
       else
       {
-        argumentStream >> argumentName;
+        argumentName = queryToken;
         if (argumentName == "*")
         {
           argumentOf = "all";
