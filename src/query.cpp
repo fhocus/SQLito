@@ -256,6 +256,10 @@ Query *Query::parse(std::string query)
           filtersGroup.push_back(logicOperator);
           logicOperator = "";
         }
+        else
+        {
+          break;
+        }
       }
     }
 
